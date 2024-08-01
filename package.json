@@ -1,0 +1,20 @@
+{
+  "name": "com.rizwan.UnityUIAnimation]",
+  "version": "0.1.0",
+  "displayName": "Unity UI Animation",
+  "description": "This package provides a way to utilize Sprite Sequences as animation for UI",
+  "unity": "2019.1",
+  "unityRelease": "0b5",
+  "documentationUrl": "https://example.com/",
+  "changelogUrl": "https://example.com/changelog.html",
+  "licensesUrl": "https://example.com/licensing.html",
+  "dependencies": {
+ },
+ "keywords": [
+  ],
+  "author": {
+    "name": "Mohammed Rizwan",
+    "email": "redrizwan007@gmail.com",
+    "url": "https://www.unity3d.com"
+  }
+}
