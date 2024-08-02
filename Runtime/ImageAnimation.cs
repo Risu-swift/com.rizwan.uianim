@@ -6,9 +6,9 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Image))]
 public class ImageAnimation : MonoBehaviour
 {
-    [SerializeField] private ImageAnimSequence animationSequence;
-    [SerializeField] private bool isAutoPlay = false;
-    [SerializeField] private bool isLoop = false;
+    public ImageAnimSequence animationSequence;
+    public bool isAutoPlay = false;
+    public bool isLoop = false;
 
     private Image image;
 
@@ -40,6 +40,10 @@ public class ImageAnimation : MonoBehaviour
 
     }
 
+    void OnDisable()
+    {
+        Play(0);
+    }
 
     public void PlayPercent(int percentage) => Play((float)percentage / 100f);
 
