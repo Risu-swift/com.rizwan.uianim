@@ -6,7 +6,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Image))]
 public class ImageAnimation : MonoBehaviour
 {
-    public ImageAnimSequence animationSequence;
+    public List<ImageAnimSequence> animationSequence;
     public bool isAutoPlay = false;
     public bool isLoop = false;
 
@@ -17,8 +17,9 @@ public class ImageAnimation : MonoBehaviour
     private bool isPlaying = false;
     private float playbackPercentage = 1f;
     private float elapsedTime;
-    private int startFrameIndex;
-    private int endFrameIndex;
+    private int currentFrameIndex;
+    private int sequenceIndex = 0;
+    private int targetFrameIndex;
     private bool hasStarted = false;
 
 
@@ -27,14 +28,17 @@ public class ImageAnimation : MonoBehaviour
     {
         image = gameObject.GetComponent<Image>();
 
-        if (animationSequence != null)
+        if (animationSequence != null && animationSequence.Count > 0)
+
         {
-            frameDuration = 1f / animationSequence.TargetFPS;
-            totalFrames = animationSequence.AnimationSequence.Count;
 
             if (isAutoPlay)
             {
                 Play(1f);
+            }
+            else
+            {
+                image.sprite = animationSequence[0].AnimationSequence[0];
             }
         }
 
@@ -42,7 +46,7 @@ public class ImageAnimation : MonoBehaviour
 
     void OnDisable()
     {
-        Play(0);
+        ResetAnimation();
     }
 
     public void PlayPercent(int percentage) => Play((float)percentage / 100f);
@@ -60,19 +64,27 @@ public class ImageAnimation : MonoBehaviour
 
                 if (hasStarted)
                 {
-                    startFrameIndex++;
+                    currentFrameIndex++;
 
-                    if (startFrameIndex > endFrameIndex)
+                    if (currentFrameIndex > targetFrameIndex)
                     {
-                        if (isLoop)
+                        if (sequenceIndex < animationSequence.Count - 1)
                         {
-                            startFrameIndex = Mathf.FloorToInt(totalFrames * 0);
-                            elapsedTime = 0f;
+                            sequenceIndex++;
+                            StartNewSequence();
                         }
+
                         else
                         {
-                            isPlaying = false;
-                            startFrameIndex = endFrameIndex;
+                            if (isLoop)
+                            {
+                                currentFrameIndex = 0;
+                                elapsedTime = 0f;
+                            }
+                            else
+                            {
+                                isPlaying = false;
+                            }
                         }
                     }
                 }
@@ -82,16 +94,16 @@ public class ImageAnimation : MonoBehaviour
                 hasStarted = true;
             }
 
-            if (hasStarted)
+            if (currentFrameIndex >= 0 && currentFrameIndex < totalFrames)
             {
-                image.sprite = animationSequence.AnimationSequence[startFrameIndex];
+                image.sprite = animationSequence[sequenceIndex].AnimationSequence[currentFrameIndex];
             }
         }
     }
 
     public void Play(float percentage)
     {
-        if (animationSequence == null || percentage <= 0f) return;
+        if (animationSequence == null || animationSequence.Count == 0 || percentage <= 0f) return;
 
         if (!isPlaying)
         {
@@ -102,24 +114,59 @@ public class ImageAnimation : MonoBehaviour
 
         playbackPercentage = Mathf.Clamp01(percentage);
 
-        int currentFrameIndex = animationSequence.AnimationSequence.IndexOf(image.sprite);
+        var currentSequence = animationSequence[sequenceIndex];
+        frameDuration = 1f / currentSequence.TargetFPS;
+        totalFrames = currentSequence.AnimationSequence.Count;
+        targetFrameIndex = Mathf.FloorToInt(totalFrames * playbackPercentage) - 1;
 
-        if (currentFrameIndex < 0)
+        if (targetFrameIndex >= totalFrames) targetFrameIndex = totalFrames - 1;
+
+        if (!hasStarted)
         {
-            currentFrameIndex = 0;
+            currentFrameIndex = Mathf.Clamp(currentFrameIndex, 0, targetFrameIndex);
+            image.sprite = currentSequence.AnimationSequence[currentFrameIndex];
         }
-
-        startFrameIndex = currentFrameIndex;
-        endFrameIndex = Mathf.FloorToInt(totalFrames * playbackPercentage) - 1;
-
-        if (endFrameIndex >= totalFrames) endFrameIndex = totalFrames - 1;
-
-        image.sprite = animationSequence.AnimationSequence[startFrameIndex];
+        else
+        {
+            if (currentFrameIndex <= targetFrameIndex)
+            {
+                StartPlaybackFromCurrentFrame(targetFrameIndex);
+            }
+        }
     }
 
-    private void ShowFrame(int frameNumber)
+    private void StartNewSequence()
     {
-        image.sprite = animationSequence.AnimationSequence[frameNumber];
-        // currentFrame++;
+        var currentSequence = animationSequence[sequenceIndex];
+        frameDuration = 1f / currentSequence.TargetFPS;
+        totalFrames = currentSequence.AnimationSequence.Count;
+        currentFrameIndex = 0;
+        image.sprite = currentSequence.AnimationSequence[currentFrameIndex];
+    }
+
+    private void StartPlaybackFromCurrentFrame(int targetFrameIndex)
+    {
+        currentFrameIndex = Mathf.Clamp(currentFrameIndex, 0, targetFrameIndex);
+        image.sprite = animationSequence[sequenceIndex].AnimationSequence[currentFrameIndex];
+        hasStarted = true;
+    }
+
+    private void ResetAnimation()
+    {
+        isPlaying = false;
+        hasStarted = false;
+        elapsedTime = 0f;
+        playbackPercentage = 0f;
+        currentFrameIndex = 0;
+        targetFrameIndex = 0;
+        sequenceIndex = 0;
+
+        if (animationSequence != null && animationSequence.Count > 0)
+        {
+            var initialSequence = animationSequence[0];
+            image.sprite = initialSequence.AnimationSequence[0];
+            frameDuration = 1f / initialSequence.TargetFPS;
+            totalFrames = initialSequence.AnimationSequence.Count;
+        }
     }
 }
