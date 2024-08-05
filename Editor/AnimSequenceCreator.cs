@@ -4,6 +4,7 @@ using System.IO;
 using UnityEditor;
 using System.Linq;
 
+#if UNITY_EDITOR
 public class AnimSequenceCreator : Editor
 {
     [MenuItem("Assets/Create Sprite List", true)]
@@ -82,3 +83,4 @@ public class AnimSequenceCreator : Editor
         return Sprite.Create(texture, rect, pivot);
     }
 }
+#endif
