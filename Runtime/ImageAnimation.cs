@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Events;
-
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Image))]
 public class ImageAnimation : MonoBehaviour
@@ -25,7 +24,7 @@ public class ImageAnimation : MonoBehaviour
     private bool hasStarted = false;
 
     public UnityEvent OnAnimationEnd;
-    
+
     // Start is called before the first frame update
     void OnEnable()
     {
@@ -83,7 +82,7 @@ public class ImageAnimation : MonoBehaviour
                             {
                                 currentFrameIndex = 0;
                                 elapsedTime = 0f;
-                                OnAnimationEnd?.Invoke();
+                                OnAnimationEnd.Invoke();
                             }
                             else
                             {
