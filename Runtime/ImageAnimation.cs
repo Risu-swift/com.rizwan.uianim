@@ -22,7 +22,8 @@ public class ImageAnimation : MonoBehaviour
     private int targetFrameIndex;
     private bool hasStarted = false;
 
-
+    public UnityEvent OnAnimationEnd;
+    
     // Start is called before the first frame update
     void OnEnable()
     {
@@ -80,6 +81,7 @@ public class ImageAnimation : MonoBehaviour
                             {
                                 currentFrameIndex = 0;
                                 elapsedTime = 0f;
+                                OnAnimationEnd?.Invoke();
                             }
                             else
                             {
