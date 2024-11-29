@@ -82,12 +82,13 @@ public class ImageAnimation : MonoBehaviour
                             {
                                 currentFrameIndex = 0;
                                 elapsedTime = 0f;
-                                OnAnimationEnd.Invoke();
                             }
                             else
                             {
                                 isPlaying = false;
                             }
+                            OnAnimationEnd.Invoke();
+
                         }
                     }
                 }
